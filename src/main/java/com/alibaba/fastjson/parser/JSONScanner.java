@@ -1934,15 +1934,15 @@ public final class JSONScanner extends JSONLexerBase {
         return dateVal;
     }
 
-    private char readPosDate(char ch, int endIndex, int startPos, char startChar) {
+    private char readPosDate(int endIndex, int startPos, char startChar) {
         for (; ; ) {
-            if (ch == ',' || ch == ']') {
+            if (chLocal == ',' || chLocal == ']') {
                 bp = endIndex + 1;
-                this.ch = ch;
+                this.ch = chLocal;
                 break;
             } else if (isWhitespace(ch)) {
                 endIndex++;
-                ch = charAt(endIndex + 1);
+                chLocal = charAt(endIndex + 1);
             } else {
                 this.bp = startPos;
                 this.ch = startChar;
@@ -2011,7 +2011,7 @@ public final class JSONScanner extends JSONLexerBase {
                 return null;
             }
             chLocal = charAt(indexOf('"', index) + 1);
-            chLocal = readPosDate(chLocal, indexOf('"', index), startPos, startChar);
+            chLocal = readPosDate(indexOf('"', index), startPos, startChar);
             if (chLocal == '\0') {
                 return null;
             }

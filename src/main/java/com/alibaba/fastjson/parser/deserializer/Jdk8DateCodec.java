@@ -210,8 +210,12 @@ public class Jdk8DateCodec extends ContextObjectDeserializer implements ObjectSe
             char c7 = text.charAt(7);
 
             if (text.charAt(13) == ':' && text.charAt(16) == ':') {
-                if (c4 == '-' && c7 == '-' && text.charAt(10) == 'T') {
-                    return DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+                if (c4 == '-' && c7 == '-'){
+                    if (text.charAt(10) == 'T') {
+                        return DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+                    } else if(text.charAt(10) == ' ') {
+                        return defaultFormatter;
+                    }
                 } else if (c4 == '/' && c7 == '/') { // tw yyyy/mm/dd
                     return formatter_dt19_tw;
                 } else {
@@ -223,7 +227,7 @@ public class Jdk8DateCodec extends ContextObjectDeserializer implements ObjectSe
         if (text.length() >= 17) {
             return getAsianDateTimeFormat(text);
         }
-        return defaultFormatter;
+        return null;
     }
 
     protected LocalDateTime parseDateTime(String text, DateTimeFormatter formatter) {

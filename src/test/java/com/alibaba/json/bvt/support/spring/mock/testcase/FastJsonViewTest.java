@@ -1,8 +1,6 @@
 package com.alibaba.json.bvt.support.spring.mock.testcase;
 
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.FastJsonViewResponseBodyAdvice;
-import com.alibaba.fastjson.support.spring.FastJsonpResponseBodyAdvice;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

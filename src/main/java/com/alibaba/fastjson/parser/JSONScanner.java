@@ -1003,7 +1003,7 @@ public final class JSONScanner extends JSONLexerBase {
                 }
             }
         } else if (ch == '-' || (ch >= '0' && ch <= '9')) {
-            long millis = 0;
+                long millis = 0;
 
             boolean negative = false;
             if (ch == '-') {
@@ -1011,20 +1011,7 @@ public final class JSONScanner extends JSONLexerBase {
                 negative = true;
             }
 
-            if (ch >= '0' && ch <= '9') {
-                millis = ch - '0';
-                for (; ; ) {
-                    ch = charAt(index++);
-                    if (ch >= '0' && ch <= '9') {
-                        millis = millis * 10 + (ch - '0');
-                    } else {
-                        if (ch == ',' || ch == '}') {
-                            bp = index - 1;
-                        }
-                        break;
-                    }
-                }
-            }
+            millis = milliScanner(millis, index);
 
             if (millis < 0) {
                 matchStat = NOT_MATCH;
@@ -1070,6 +1057,25 @@ public final class JSONScanner extends JSONLexerBase {
             matchStat = END;
         }
         return dateVal;
+    }
+
+    public long milliScanner(long millis, int index) {
+
+        if (ch >= '0' && ch <= '9') {
+            millis = ch - '0';
+            for (; ; ) {
+                ch = charAt(index++);
+                if (ch >= '0' && ch <= '9') {
+                    millis = millis * 10 + (ch - '0');
+                } else {
+                    if (ch == ',' || ch == '}') {
+                        bp = index - 1;
+                    }
+                    break;
+                }
+            }
+        }
+        return millis;
     }
 
     public long scanFieldSymbol(char[] fieldName) {
@@ -1903,15 +1909,13 @@ public final class JSONScanner extends JSONLexerBase {
     }
 
     private java.util.Date scanPositiveDate(int index, int startPos, char startChar) {
-        int startIndex = index;
-        int endIndex = indexOf('"', startIndex);
+        int endIndex = indexOf('"', index);
         java.util.Date dateVal;
         if (endIndex == -1) {
             throw new JSONException("unclosed str");
         }
-        int rest = endIndex - startIndex;
+        int rest = endIndex - index;
         bp = index;
-
         if (scanISO8601DateIfMatch(false, rest)) {
             dateVal = calendar.getTime();
         } else {
@@ -1926,16 +1930,13 @@ public final class JSONScanner extends JSONLexerBase {
         for (; ; ) {
             if (ch == ',' || ch == ']') {
                 bp = endIndex + 1;
-                this.ch = ch;
                 break;
             } else if (isWhitespace(ch)) {
                 endIndex++;
                 ch = charAt(endIndex + 1);
             } else {
-                this.bp = startPos;
                 this.ch = startChar;
                 matchStat = NOT_MATCH;
-
                 return null;
             }
         }
@@ -1950,20 +1951,7 @@ public final class JSONScanner extends JSONLexerBase {
             ch = charAt(index++);
             negative = true;
         }
-        if (ch >= '0' && ch <= '9') {
-            millis = ch - '0';
-            for (; ; ) {
-                ch = charAt(index++);
-                if (ch >= '0' && ch <= '9') {
-                    millis = millis * 10 + (ch - '0');
-                } else {
-                    if (ch == ',' || ch == ']') {
-                        bp = index - 1;
-                    }
-                    break;
-                }
-            }
-        }
+        millis = milliScanner(millis, index);
         if (millis < 0) {
             this.bp = startPos;
             this.ch = startChar;
@@ -2000,19 +1988,9 @@ public final class JSONScanner extends JSONLexerBase {
         } else if (ch == '-' || (ch >= '0' && ch <= '9')) {
             dateVal = scanNegativeDate(index, startPos, startChar);
         } else if (ch == 'n') {
-            String isNull;
-            try {
-                isNull = text.substring(ch, ch + 4);
-            } catch (IndexOutOfBoundsException e) {
-                scanInvalidDate(startPos, startChar);
-                return null;
-            }
-            if (isNull.equals("null")) {
+            if (checkNull(index, startPos, startChar) == null) {
                 dateVal = null;
-                ch = charAt(index);
-                bp = index;
             }
-
         } else {
             scanInvalidDate(startPos, startChar);
             return null;
@@ -2025,6 +2003,31 @@ public final class JSONScanner extends JSONLexerBase {
 
         } else {
             //condition ch == '}' is always 'true'
+            if (endOfJSON(startPos, startChar) == null) {
+                dateVal = null;
+            }
+            return dateVal;
+        }
+    }
+
+    private java.util.Date checkNull(int index, int startPos, char startChar) {
+        java.util.Date dateVal;
+        String isNull;
+        try {
+            isNull = text.substring(ch, ch + 4);
+        } catch (IndexOutOfBoundsException e) {
+            scanInvalidDate(startPos, startChar);
+            return null;
+        }
+        if (isNull.equals("null")) {
+            dateVal = null;
+            ch = charAt(index);
+            bp = index;
+            return dateVal;
+        }
+        return new java.util.Date();
+    }
+    private java.util.Date endOfJSON(int startPos, char startChar) {
             ch = charAt(++bp);
             if (ch == ',') {
                 token = JSONToken.COMMA;
@@ -2036,7 +2039,6 @@ public final class JSONScanner extends JSONLexerBase {
                 token = JSONToken.RBRACE;
                 this.ch = charAt(++bp);
             } else if (ch == EOI) {
-                this.ch = EOI;
                 token = JSONToken.EOF;
             } else {
                 this.bp = startPos;
@@ -2045,8 +2047,7 @@ public final class JSONScanner extends JSONLexerBase {
                 return null;
             }
             matchStat = END;
-        }
-        return dateVal;
+        return new java.util.Date();
     }
 
     protected final void arrayCopy(int srcPos, char[] dest, int destPos, int length) {

@@ -1934,7 +1934,7 @@ public final class JSONScanner extends JSONLexerBase {
         return dateVal;
     }
 
-    private char readPosDate(int endIndex, int startPos, char startChar) {
+    private java.util.Date readPosDate(int endIndex, int startPos, char startChar) {
         for (; ; ) {
             if (chLocal == ',' || chLocal == ']') {
                 bp = endIndex + 1;
@@ -1947,10 +1947,10 @@ public final class JSONScanner extends JSONLexerBase {
                 this.bp = startPos;
                 this.ch = startChar;
                 matchStat = NOT_MATCH;
-                return '\0';
+                return null;
             }
         }
-        return ch;
+        return new java.util.Date();
     }
 
     private char chLocal;
@@ -2007,15 +2007,11 @@ public final class JSONScanner extends JSONLexerBase {
         final java.util.Date dateVal;
         if (chLocal == '"') {
             dateVal = scanPositiveDate(index, startPos, startChar);
-            if (dateVal == null) {
-                return null;
-            }
             chLocal = charAt(indexOf('"', index) + 1);
-            chLocal = readPosDate(indexOf('"', index), startPos, startChar);
-            if (chLocal == '\0') {
+            java.util.Date isNull = readPosDate(indexOf('"', index), startPos, startChar);
+            if (dateVal == null || isNull == null) {
                 return null;
             }
-
         } else if (chLocal == '-' || (chLocal >= '0' && chLocal <= '9')) {
             dateVal = scanNegDate(index, startPos, startChar);
         } else if (chLocal == 'n'

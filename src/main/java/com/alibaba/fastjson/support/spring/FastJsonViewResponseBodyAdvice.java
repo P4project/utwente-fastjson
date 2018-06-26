@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
  * A convenient base class for {@code ResponseBodyAdvice} implementations
- * that customize the response before JSON serialization with concrete
+ * that customize the response before JSON serialization with {@link FastJsonHttpMessageConverter4}'s concrete
  * subclasses.
  * <p>
  *

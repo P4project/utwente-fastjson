@@ -31,13 +31,13 @@ import java.util.*;
 public final class JSONScanner extends JSONLexerBase {
 
     private final String text;
-    private final int    len;
+    private final int len;
 
-    public JSONScanner(String input){
+    public JSONScanner(String input) {
         this(input, JSON.DEFAULT_PARSER_FEATURE);
     }
 
-    public JSONScanner(String input, int features){
+    public JSONScanner(String input, int features) {
         super(features);
 
         text = input;
@@ -65,11 +65,11 @@ public final class JSONScanner extends JSONLexerBase {
                 : text.charAt(index));
     }
 
-    public JSONScanner(char[] input, int inputLength){
+    public JSONScanner(char[] input, int inputLength) {
         this(input, inputLength, JSON.DEFAULT_PARSER_FEATURE);
     }
 
-    public JSONScanner(char[] input, int inputLength, int features){
+    public JSONScanner(char[] input, int inputLength, int features) {
         this(new String(input, 0, inputLength), features);
     }
 
@@ -258,7 +258,6 @@ public final class JSONScanner extends JSONLexerBase {
             char y0, y1, y2, y3, M0, M1, d0, d1;
 
 
-
             char c8 = charAt(bp + 8);
 
             final boolean c_47 = c4 == '-' && c7 == '-';
@@ -370,7 +369,7 @@ public final class JSONScanner extends JSONLexerBase {
         int date_len = 10;
         char y0, y1, y2, y3, M0, M1, d0, d1;
         if ((c4 == '-' && c7 == '-') // cn
-                ||  (c4 == '/' && c7 == '/') // tw yyyy/mm/dd
+                || (c4 == '/' && c7 == '/') // tw yyyy/mm/dd
                 ) {
             y0 = c0;
             y1 = c1;
@@ -422,7 +421,7 @@ public final class JSONScanner extends JSONLexerBase {
                     if (c9 == '日' || c9 == '일') {
                         d0 = '0';
                         d1 = c8;
-                    } else if (charAt(bp + 10) == '日' || charAt(bp + 10) == '일'){
+                    } else if (charAt(bp + 10) == '日' || charAt(bp + 10) == '일') {
                         d0 = c8;
                         d1 = c9;
                         date_len = 11;
@@ -435,7 +434,7 @@ public final class JSONScanner extends JSONLexerBase {
                     if (c8 == '日' || c8 == '일') {
                         d0 = '0';
                         d1 = c7;
-                    } else if (c9 == '日' || c9 == '일'){
+                    } else if (c9 == '日' || c9 == '일') {
                         d0 = c7;
                         d1 = c8;
                     } else {
@@ -765,7 +764,7 @@ public final class JSONScanner extends JSONLexerBase {
         int value;
         if (ch >= '0' && ch <= '9') {
             value = ch - '0';
-            for (;;) {
+            for (; ; ) {
                 ch = charAt(index++);
                 if (ch >= '0' && ch <= '9') {
                     value = value * 10 + (ch - '0');
@@ -791,11 +790,11 @@ public final class JSONScanner extends JSONLexerBase {
                 }
             }
 
-            for (;;) {
+            for (; ; ) {
                 if (ch == ',' || ch == '}') {
                     bp = index - 1;
                     break;
-                } else if(isWhitespace(ch)) {
+                } else if (isWhitespace(ch)) {
                     ch = charAt(index++);
                     continue;
                 } else {
@@ -856,7 +855,7 @@ public final class JSONScanner extends JSONLexerBase {
         int startPos = this.bp;
         char startChar = this.ch;
 
-        for (;;) {
+        for (; ; ) {
             if (!charArrayCompare(text, bp, fieldName)) {
                 if (isWhitespace(ch)) {
                     next();
@@ -888,7 +887,7 @@ public final class JSONScanner extends JSONLexerBase {
 
             String stringVal = subString(startIndex, endIndex - startIndex);
             if (stringVal.indexOf('\\') != -1) {
-                for (;;) {
+                for (; ; ) {
                     int slashCount = 0;
                     for (int i = endIndex - 1; i >= 0; --i) {
                         if (charAt(i) == '\\') {
@@ -911,7 +910,7 @@ public final class JSONScanner extends JSONLexerBase {
 
             ch = charAt(endIndex + 1);
 
-            for (;;) {
+            for (; ; ) {
                 if (ch == ',' || ch == '}') {
                     bp = endIndex + 1;
                     this.ch = ch;
@@ -1094,7 +1093,7 @@ public final class JSONScanner extends JSONLexerBase {
         }
 
         long hash = 0xcbf29ce484222325L;
-        for (;;) {
+        for (; ; ) {
             ch = charAt(index++);
             if (ch == '\"') {
                 bp = index;
@@ -1109,7 +1108,7 @@ public final class JSONScanner extends JSONLexerBase {
             hash *= 0x100000001b3L;
         }
 
-        for (;;) {
+        for (; ; ) {
             if (ch == ',') {
                 this.ch = charAt(++bp);
                 matchStat = VALUE;
@@ -1148,7 +1147,7 @@ public final class JSONScanner extends JSONLexerBase {
     }
 
     @Override
-    public Collection<String> newCollectionByType(Class<?> type){
+    public Collection<String> newCollectionByType(Class<?> type) {
         if (type.isAssignableFrom(HashSet.class)) {
             HashSet<String> list = new HashSet<String>();
             return list;
@@ -1196,7 +1195,7 @@ public final class JSONScanner extends JSONLexerBase {
         if (ch == '[') {
             ch = charAt(index++);
 
-            for (;;) {
+            for (; ; ) {
                 if (ch == '"') {
                     int startIndex = index;
                     int endIndex = indexOf('"', startIndex);
@@ -1206,7 +1205,7 @@ public final class JSONScanner extends JSONLexerBase {
 
                     String stringVal = subString(startIndex, endIndex - startIndex);
                     if (stringVal.indexOf('\\') != -1) {
-                        for (;;) {
+                        for (; ; ) {
                             int slashCount = 0;
                             for (int i = endIndex - 1; i >= 0; --i) {
                                 if (charAt(i) == '\\') {
@@ -1275,7 +1274,7 @@ public final class JSONScanner extends JSONLexerBase {
             return list;
         } else if (ch == '}') {
             ch = charAt(bp);
-            for (;;) {
+            for (; ; ) {
                 if (ch == ',') {
                     token = JSONToken.COMMA;
                     this.ch = charAt(++bp);
@@ -1346,7 +1345,7 @@ public final class JSONScanner extends JSONLexerBase {
         long value;
         if (ch >= '0' && ch <= '9') {
             value = ch - '0';
-            for (;;) {
+            for (; ; ) {
                 ch = charAt(index++);
                 if (ch >= '0' && ch <= '9') {
                     value = value * 10 + (ch - '0');
@@ -1384,7 +1383,7 @@ public final class JSONScanner extends JSONLexerBase {
             return 0;
         }
 
-        for (;;) {
+        for (; ; ) {
             if (ch == ',') {
                 this.ch = charAt(++bp);
                 matchStat = VALUE;
@@ -1392,7 +1391,7 @@ public final class JSONScanner extends JSONLexerBase {
                 return negative ? -value : value;
             } else if (ch == '}') {
                 ch = charAt(++bp);
-                for (;;) {
+                for (; ; ) {
                     if (ch == ',') {
                         token = JSONToken.COMMA;
                         this.ch = charAt(++bp);
@@ -1501,14 +1500,14 @@ public final class JSONScanner extends JSONLexerBase {
             ch = charAt(bp);
             value = false;
         } else if (ch == '1') {
-                if (quote && charAt(index++) != '"') {
-                    matchStat = NOT_MATCH;
-                    return false;
-                }
+            if (quote && charAt(index++) != '"') {
+                matchStat = NOT_MATCH;
+                return false;
+            }
 
-                bp = index;
-                ch = charAt(bp);
-                value = true;
+            bp = index;
+            ch = charAt(bp);
+            value = true;
         } else if (ch == '0') {
             if (quote && charAt(index++) != '"') {
                 matchStat = NOT_MATCH;
@@ -1523,7 +1522,7 @@ public final class JSONScanner extends JSONLexerBase {
             return false;
         }
 
-        for (;;) {
+        for (; ; ) {
             if (ch == ',') {
                 this.ch = charAt(++bp);
                 matchStat = VALUE;
@@ -1531,7 +1530,7 @@ public final class JSONScanner extends JSONLexerBase {
                 break;
             } else if (ch == '}') {
                 ch = charAt(++bp);
-                for (;;) {
+                for (; ; ) {
                     if (ch == ',') {
                         token = JSONToken.COMMA;
                         this.ch = charAt(++bp);
@@ -1592,7 +1591,7 @@ public final class JSONScanner extends JSONLexerBase {
         int value;
         if (chLocal >= '0' && chLocal <= '9') {
             value = chLocal - '0';
-            for (;;) {
+            for (; ; ) {
                 chLocal = charAt(offset++);
                 if (chLocal >= '0' && chLocal <= '9') {
                     value = value * 10 + (chLocal - '0');
@@ -1627,7 +1626,7 @@ public final class JSONScanner extends JSONLexerBase {
                 chLocal = charAt(offset++);
             }
 
-            for (;;) {
+            for (; ; ) {
                 if (chLocal == ',') {
                     bp = offset;
                     this.ch = charAt(bp);
@@ -1653,7 +1652,7 @@ public final class JSONScanner extends JSONLexerBase {
             return 0;
         }
 
-        for (;;) {
+        for (; ; ) {
             if (chLocal == expectNext) {
                 bp = offset;
                 this.ch = charAt(bp);
@@ -1672,7 +1671,7 @@ public final class JSONScanner extends JSONLexerBase {
     }
 
     @Override
-    public  double scanDouble(char seperator) {
+    public double scanDouble(char seperator) {
         matchStat = UNKNOWN;
 
         int offset = bp;
@@ -1774,7 +1773,7 @@ public final class JSONScanner extends JSONLexerBase {
                 chLocal = charAt(offset++);
             }
 
-            for (;;) {
+            for (; ; ) {
                 if (chLocal == ',') {
                     bp = offset;
                     this.ch = charAt(bp);
@@ -1832,7 +1831,7 @@ public final class JSONScanner extends JSONLexerBase {
         long value;
         if (chLocal >= '0' && chLocal <= '9') {
             value = chLocal - '0';
-            for (;;) {
+            for (; ; ) {
                 chLocal = charAt(offset++);
                 if (chLocal >= '0' && chLocal <= '9') {
                     value = value * 10 + (chLocal - '0');
@@ -1869,7 +1868,7 @@ public final class JSONScanner extends JSONLexerBase {
                 chLocal = charAt(offset++);
             }
 
-            for (;;) {
+            for (; ; ) {
                 if (chLocal == ',') {
                     bp = offset;
                     this.ch = charAt(bp);
@@ -1895,7 +1894,7 @@ public final class JSONScanner extends JSONLexerBase {
             return 0;
         }
 
-        for (;;) {
+        for (; ; ) {
             if (chLocal == seperator) {
                 bp = offset;
                 this.ch = charAt(bp);
@@ -2033,7 +2032,10 @@ public final class JSONScanner extends JSONLexerBase {
 
             return null;
         }
+        return continueScanDate(dateVal, startPos, startChar);
+    }
 
+    private java.util.Date continueScanDate(java.util.Date dateVal, int startPos, char startChar) {
         if (chLocal == ',') {
             this.ch = charAt(++bp);
             matchStat = VALUE;
@@ -2063,6 +2065,7 @@ public final class JSONScanner extends JSONLexerBase {
         }
         return dateVal;
     }
+
 
     protected final void arrayCopy(int srcPos, char[] dest, int destPos, int length) {
         text.getChars(srcPos, srcPos + length, dest, destPos);
@@ -2129,7 +2132,7 @@ public final class JSONScanner extends JSONLexerBase {
 
         String[] types = argTypesCount >= 0 ? new String[argTypesCount] : new String[4];
         int typeIndex = 0;
-        for (;;) {
+        for (; ; ) {
             while (isWhitespace(this.ch)) {
                 next();
             }

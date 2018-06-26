@@ -736,6 +736,7 @@ public final class JSONScanner extends JSONLexerBase {
         return bp == len || ch == EOI && bp + 1 == len;
     }
 
+    @Override
     public int scanFieldInt(char[] fieldName) {
         matchStat = UNKNOWN;
         int startPos = this.bp;
@@ -849,6 +850,7 @@ public final class JSONScanner extends JSONLexerBase {
         return negative ? -value : value;
     }
 
+    @Override
     public String scanFieldString(char[] fieldName) {
         matchStat = UNKNOWN;
         int startPos = this.bp;
@@ -955,6 +957,7 @@ public final class JSONScanner extends JSONLexerBase {
         return strVal;
     }
 
+    @Override
     public java.util.Date scanFieldDate(char[] fieldName) {
         matchStat = UNKNOWN;
         int startPos = this.bp;
@@ -1073,6 +1076,7 @@ public final class JSONScanner extends JSONLexerBase {
         return dateVal;
     }
 
+    @Override
     public long scanFieldSymbol(char[] fieldName) {
         matchStat = UNKNOWN;
 
@@ -1143,6 +1147,7 @@ public final class JSONScanner extends JSONLexerBase {
         return hash;
     }
 
+    @Override
     public Collection<String> newCollectionByType(Class<?> type){
         if (type.isAssignableFrom(HashSet.class)) {
             HashSet<String> list = new HashSet<String>();
@@ -1160,6 +1165,7 @@ public final class JSONScanner extends JSONLexerBase {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Collection<String> scanFieldStringArray(char[] fieldName, Class<?> type) {
         matchStat = UNKNOWN;
@@ -1311,6 +1317,7 @@ public final class JSONScanner extends JSONLexerBase {
         return list;
     }
 
+    @Override
     public long scanFieldLong(char[] fieldName) {
         matchStat = UNKNOWN;
         int startPos = this.bp;
@@ -1425,6 +1432,7 @@ public final class JSONScanner extends JSONLexerBase {
         return negative ? -value : value;
     }
 
+    @Override
     public boolean scanFieldBoolean(char[] fieldName) {
         matchStat = UNKNOWN;
 
@@ -1559,6 +1567,7 @@ public final class JSONScanner extends JSONLexerBase {
         return value;
     }
 
+    @Override
     public final int scanInt(char expectNext) {
         matchStat = UNKNOWN;
 
@@ -1662,6 +1671,7 @@ public final class JSONScanner extends JSONLexerBase {
         }
     }
 
+    @Override
     public  double scanDouble(char seperator) {
         matchStat = UNKNOWN;
 
@@ -1802,6 +1812,7 @@ public final class JSONScanner extends JSONLexerBase {
         }
     }
 
+    @Override
     public long scanLong(char seperator) {
         matchStat = UNKNOWN;
 
@@ -1903,24 +1914,20 @@ public final class JSONScanner extends JSONLexerBase {
         }
     }
 
-    public java.util.Date scanDate(char seperator) {
+    @Override
+    public java.util.Date scanDate(char separator) {
         matchStat = UNKNOWN;
         int startPos = this.bp;
         char startChar = this.ch;
-
         int index = bp;
-
         char ch = charAt(index++);
-
         final java.util.Date dateVal;
         if (ch == '"') {
-            int startIndex = index;
-            int endIndex = indexOf('"', startIndex);
+            int endIndex = indexOf('"', index);
             if (endIndex == -1) {
                 throw new JSONException("unclosed str");
             }
-
-            int rest = endIndex - startIndex;
+            int rest = endIndex - index;
             bp = index;
             if (scanISO8601DateIfMatch(false, rest)) {
                 dateVal = calendar.getTime();

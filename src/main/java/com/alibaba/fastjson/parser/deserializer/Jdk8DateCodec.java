@@ -172,6 +172,7 @@ public class Jdk8DateCodec extends ContextObjectDeserializer implements ObjectSe
         } else if (c4 == '년') {
             return formatter_dt19_kr;
         }
+        return null;
     }
 
     private DateTimeFormatter getWesternDateTimeFormat (String text) {

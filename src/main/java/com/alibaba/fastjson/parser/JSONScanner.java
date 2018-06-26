@@ -1954,67 +1954,77 @@ public final class JSONScanner extends JSONLexerBase {
         return ch;
     }
 
+    private char chLocal;
+
+    private java.util.Date scanNegDate(int index, int startPos, char startChar) {
+        long millis = 0;
+
+        boolean negative = false;
+        if (chLocal == '-') {
+            chLocal = charAt(index++);
+            negative = true;
+        }
+
+        if (chLocal >= '0' && chLocal <= '9') {
+            millis = readNegDate(millis, index);
+        }
+
+        if (millis < 0) {
+            this.bp = startPos;
+            this.ch = startChar;
+            matchStat = NOT_MATCH;
+            return null;
+        }
+
+        if (negative) {
+            millis = -millis;
+        }
+        return new java.util.Date(millis);
+    }
+
+    private long readNegDate(long millis, int index) {
+        millis = chLocal - '0';
+        for (; ; ) {
+            chLocal = charAt(index++);
+            if (chLocal >= '0' && chLocal <= '9') {
+                millis = millis * 10 + (chLocal - '0');
+            } else {
+                if (chLocal == ',' || chLocal == ']') {
+                    bp = index - 1;
+                }
+                break;
+            }
+        }
+        return millis;
+    }
+
     @Override
     public java.util.Date scanDate(char separator) {
         matchStat = UNKNOWN;
         int startPos = this.bp;
         char startChar = this.ch;
         int index = bp;
-        char ch = charAt(index++);
+        chLocal = charAt(index++);
         final java.util.Date dateVal;
-        if (ch == '"') {
+        if (chLocal == '"') {
             dateVal = scanPositiveDate(index, startPos, startChar);
             if (dateVal == null) {
                 return null;
             }
-            ch = charAt(indexOf('"', index) + 1);
-            ch = readPosDate(ch, indexOf('"', index), startPos, startChar);
-            if (ch == '\0') {
+            chLocal = charAt(indexOf('"', index) + 1);
+            chLocal = readPosDate(chLocal, indexOf('"', index), startPos, startChar);
+            if (chLocal == '\0') {
                 return null;
             }
 
-        } else if (ch == '-' || (ch >= '0' && ch <= '9')) {
-            long millis = 0;
-
-            boolean negative = false;
-            if (ch == '-') {
-                ch = charAt(index++);
-                negative = true;
-            }
-
-            if (ch >= '0' && ch <= '9') {
-                millis = ch - '0';
-                for (; ; ) {
-                    ch = charAt(index++);
-                    if (ch >= '0' && ch <= '9') {
-                        millis = millis * 10 + (ch - '0');
-                    } else {
-                        if (ch == ',' || ch == ']') {
-                            bp = index - 1;
-                        }
-                        break;
-                    }
-                }
-            }
-
-            if (millis < 0) {
-                this.bp = startPos;
-                this.ch = startChar;
-                matchStat = NOT_MATCH;
-                return null;
-            }
-
-            if (negative) {
-                millis = -millis;
-            }
-
-            dateVal = new java.util.Date(millis);
-        } else if (ch == 'n'
+        } else if (chLocal == '-' || (chLocal >= '0' && chLocal <= '9')) {
+            dateVal = scanNegDate(index, startPos, startChar);
+        } else if (chLocal == 'n'
                 && charAt(index++) == 'u'
                 && charAt(index++) == 'l'
                 && charAt(index++) == 'l') {
             dateVal = null;
-            ch = charAt(index);
+            chLocal = charAt(index);
             bp = index;
         } else {
             this.bp = startPos;
@@ -2024,23 +2034,23 @@ public final class JSONScanner extends JSONLexerBase {
             return null;
         }
 
-        if (ch == ',') {
+        if (chLocal == ',') {
             this.ch = charAt(++bp);
             matchStat = VALUE;
             return dateVal;
         } else {
             //condition ch == '}' is always 'true'
-            ch = charAt(++bp);
-            if (ch == ',') {
+            chLocal = charAt(++bp);
+            if (chLocal == ',') {
                 token = JSONToken.COMMA;
                 this.ch = charAt(++bp);
-            } else if (ch == ']') {
+            } else if (chLocal == ']') {
                 token = JSONToken.RBRACKET;
                 this.ch = charAt(++bp);
-            } else if (ch == '}') {
+            } else if (chLocal == '}') {
                 token = JSONToken.RBRACE;
                 this.ch = charAt(++bp);
-            } else if (ch == EOI) {
+            } else if (chLocal == EOI) {
                 this.ch = EOI;
                 token = JSONToken.EOF;
             } else {

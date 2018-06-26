@@ -1914,6 +1914,46 @@ public final class JSONScanner extends JSONLexerBase {
         }
     }
 
+    private java.util.Date scanPositiveDate(int index, int startPos, char startChar) {
+        final java.util.Date dateVal;
+        int endIndex = indexOf('"', index);
+
+        if (endIndex == -1) {
+            throw new JSONException("unclosed str");
+        }
+        int rest = endIndex - index;
+        bp = index;
+        if (scanISO8601DateIfMatch(false, rest)) {
+            dateVal = calendar.getTime();
+        } else {
+            bp = startPos;
+            this.ch = startChar;
+            matchStat = NOT_MATCH;
+            return null;
+        }
+        bp = startPos;
+        return dateVal;
+    }
+
+    private char readPosDate(char ch, int endIndex, int startPos, char startChar) {
+        for (; ; ) {
+            if (ch == ',' || ch == ']') {
+                bp = endIndex + 1;
+                this.ch = ch;
+                break;
+            } else if (isWhitespace(ch)) {
+                endIndex++;
+                ch = charAt(endIndex + 1);
+            } else {
+                this.bp = startPos;
+                this.ch = startChar;
+                matchStat = NOT_MATCH;
+                return '\0';
+            }
+        }
+        return ch;
+    }
+
     @Override
     public java.util.Date scanDate(char separator) {
         matchStat = UNKNOWN;
@@ -1923,39 +1963,16 @@ public final class JSONScanner extends JSONLexerBase {
         char ch = charAt(index++);
         final java.util.Date dateVal;
         if (ch == '"') {
-            int endIndex = indexOf('"', index);
-            if (endIndex == -1) {
-                throw new JSONException("unclosed str");
-            }
-            int rest = endIndex - index;
-            bp = index;
-            if (scanISO8601DateIfMatch(false, rest)) {
-                dateVal = calendar.getTime();
-            } else {
-                bp = startPos;
-                this.ch = startChar;
-                matchStat = NOT_MATCH;
+            dateVal = scanPositiveDate(index, startPos, startChar);
+            if (dateVal == null) {
                 return null;
             }
-            ch = charAt(endIndex + 1);
-            bp = startPos;
-
-            for (; ; ) {
-                if (ch == ',' || ch == ']') {
-                    bp = endIndex + 1;
-                    this.ch = ch;
-                    break;
-                } else if (isWhitespace(ch)) {
-                    endIndex++;
-                    ch = charAt(endIndex + 1);
-                } else {
-                    this.bp = startPos;
-                    this.ch = startChar;
-                    matchStat = NOT_MATCH;
-
-                    return null;
-                }
+            ch = charAt(indexOf('"', index) + 1);
+            ch = readPosDate(ch, indexOf('"', index), startPos, startChar);
+            if (ch == '\0') {
+                return null;
             }
+
         } else if (ch == '-' || (ch >= '0' && ch <= '9')) {
             long millis = 0;
 

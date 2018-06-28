@@ -2010,10 +2010,7 @@ public final class JSONScanner extends JSONLexerBase {
             }
         } else if (chLocal == '-' || (chLocal >= '0' && chLocal <= '9')) {
             dateVal = scanNegDate(index, startPos, startChar);
-        } else if (chLocal == 'n'
-                && charAt(index++) == 'u'
-                && charAt(index++) == 'l'
-                && charAt(index++) == 'l') {
+        } else if (chLocal == 'n' && charAt(index++) == 'u' && charAt(index++) == 'l' && charAt(index++) == 'l') {
             dateVal = null;
             chLocal = charAt(index);
             bp = index;
@@ -2035,23 +2032,28 @@ public final class JSONScanner extends JSONLexerBase {
         } else {
             //condition ch == '}' is always 'true'
             chLocal = charAt(++bp);
-            if (chLocal == ',') {
-                token = JSONToken.COMMA;
-                this.ch = charAt(++bp);
-            } else if (chLocal == ']') {
-                token = JSONToken.RBRACKET;
-                this.ch = charAt(++bp);
-            } else if (chLocal == '}') {
-                token = JSONToken.RBRACE;
-                this.ch = charAt(++bp);
-            } else if (chLocal == EOI) {
-                this.ch = EOI;
-                token = JSONToken.EOF;
-            } else {
-                this.bp = startPos;
-                this.ch = startChar;
-                matchStat = NOT_MATCH;
-                return null;
+            switch(chLocal) {
+                case ',':
+                    token = JSONToken.COMMA;
+                    this.ch = charAt(++bp);
+                    break;
+                case ']':
+                    token = JSONToken.RBRACKET;
+                    this.ch = charAt(++bp);
+                    break;
+                case '}':
+                    token = JSONToken.RBRACE;
+                    this.ch = charAt(++bp);
+                    break;
+                case EOI:
+                    this.ch = EOI;
+                    token = JSONToken.EOF;
+                    break;
+                default:
+                    this.bp = startPos;
+                    this.ch = startChar;
+                    matchStat = NOT_MATCH;
+                    return null;
             }
             matchStat = END;
         }

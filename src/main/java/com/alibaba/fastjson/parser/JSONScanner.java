@@ -1965,7 +1965,7 @@ public final class JSONScanner extends JSONLexerBase {
         }
 
         if (chLocal >= '0' && chLocal <= '9') {
-            millis = readNegDate(millis, index);
+            millis = readNegDate(index);
         }
 
         if (millis < 0) {
@@ -1981,8 +1981,8 @@ public final class JSONScanner extends JSONLexerBase {
         return new java.util.Date(millis);
     }
 
-    private long readNegDate(long millis, int index) {
-        millis = chLocal - '0';
+    private long readNegDate(int index) {
+        long millis = chLocal - '0';
         for (; ; ) {
             chLocal = charAt(index++);
             if (chLocal >= '0' && chLocal <= '9') {

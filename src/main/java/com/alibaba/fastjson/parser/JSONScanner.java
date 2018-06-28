@@ -1957,24 +1957,20 @@ public final class JSONScanner extends JSONLexerBase {
 
     private java.util.Date scanNegDate(int index, int startPos, char startChar) {
         long millis = 0;
-
         boolean negative = false;
         if (chLocal == '-') {
             chLocal = charAt(index++);
             negative = true;
         }
-
         if (chLocal >= '0' && chLocal <= '9') {
             millis = readNegDate(index);
         }
-
-        if (millis < 0) {
-            this.bp = startPos;
-            this.ch = startChar;
-            matchStat = NOT_MATCH;
-            return null;
-        }
-
+//        if (millis < 0) {
+//            this.bp = startPos;
+//            this.ch = startChar;
+//            matchStat = NOT_MATCH;
+//            return null;
+//        }
         if (negative) {
             millis = -millis;
         }
@@ -1987,10 +1983,10 @@ public final class JSONScanner extends JSONLexerBase {
             chLocal = charAt(index++);
             if (chLocal >= '0' && chLocal <= '9') {
                 millis = millis * 10 + (chLocal - '0');
+            } else if (chLocal == ',' || chLocal == ']') {
+                bp = index - 1;
+                break;
             } else {
-                if (chLocal == ',' || chLocal == ']') {
-                    bp = index - 1;
-                }
                 break;
             }
         }
